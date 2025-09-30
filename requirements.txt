@@ -1,9 +1,8 @@
-﻿Flask
-firebase-admin
-python-dotenv
-requests
+Flask==2.3.3
+firebase-admin==6.1.1
+python-dotenv==1.1.0
+requests==2.31.0
 feedparser==6.0.11
-praw
-google-generativeai
-gunicorn
-
+praw==7.9.0
+google-generativeai==0.3.0
+gunicorn==21.2.0
