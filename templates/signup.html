@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up | YT ScriptGen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #f9fafb, #e0f2fe, #fce7f3);
+    }
+    .signup-box {
+      background-color: white;
+      padding: 2.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    #signup-error {
+      color: #dc2626;
+    }
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #4b5563;
+    }
+    footer span {
+      color: #4f46e5;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center px-4 text-gray-800">
+  <div class="signup-box w-full max-w-md text-center animate-fadeIn">
+    <h2 class="text-3xl font-bold mb-6 text-indigo-700">Create Your Account</h2>
+
+    <input type="email" id="signup-email" placeholder="Email"
+      class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+
+    <input type="password" id="signup-password" placeholder="Password (min 6 chars)"
+      class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+
+    <button onclick="signupWithEmailPassword()"
+      class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition duration-300">
+      🚀 Sign Up
+    </button>
+
+    <p id="signup-error" class="mt-4 text-sm"></p>
+
+    <p class="mt-6 text-sm text-gray-600">
+      Already have an account?
+      <a href="/login" class="text-indigo-600 font-semibold hover:underline">Login here</a>
+    </p>
+  </div>
+
+  <footer>
+    🔧 Built by <span>Vinay Kumar</span>, Founder of <span>Scriptify</span>
+  </footer>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+  <script>
+    const firebaseConfig = {
+  apiKey: "AIzaSyAFGuZOXPD7TdhgllaZJo9uMBR0ke3gjQo",
+  authDomain: "yt-script-railway.firebaseapp.com",
+  projectId: "yt-script-railway",
+  storageBucket: "yt-script-railway.firebasestorage.app",
+  messagingSenderId: "1076735009213",
+  appId: "1:1076735009213:web:c9c6d77fd437f95653f2d4",
+  measurementId: "G-60DGQY2JHK"
+};
+    firebase.initializeApp(firebaseConfig);
+
+    function signupWithEmailPassword() {
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const errorBox = document.getElementById('signup-error');
+
+      if (!email || !password) {
+        errorBox.textContent = "⚠️ Please fill both fields.";
+        return;
+      }
+
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(result => result.user.getIdToken())
+        .then(idToken => {
+          return fetch('/sessionLogin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken })
+          });
+        })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = "/hub";
+          } else {
+            throw new Error("Signup session failed");
+          }
+        })
+        .catch(error => {
+          console.error("Signup Error:", error.message);
+          errorBox.textContent = "❌ " + error.message;
+        });
+    }
+  </script>
+</body>
+</html>

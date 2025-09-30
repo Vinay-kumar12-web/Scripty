@@ -1,0 +1,26 @@
+# Ignore secret & environment files
+*.env
+firebase_key.json
+firebase_encoded.txt
+praw.ini
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Logs & local data
+*.log
+*.sqlite3
+data/*.json
+
+# Node modules (if you add frontend packages later)
+node_modules/

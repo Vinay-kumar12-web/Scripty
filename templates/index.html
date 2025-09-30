@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scriptify – Smart Script Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          animation: {
+            float: "float 3s ease-in-out infinite",
+            fadeIn: "fadeIn 1s ease-out forwards",
+            glow: "glow 2s ease-in-out infinite",
+            slideUp: "slideUp 0.8s ease-out forwards",
+            rotate: "rotate 20s linear infinite",
+            pulse: "pulse 3s ease-in-out infinite",
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-12px)' },
+            },
+            fadeIn: {
+              from: { opacity: 0, transform: 'translateY(20px)' },
+              to: { opacity: 1, transform: 'translateY(0)' },
+            },
+            glow: {
+              '0%, 100%': { boxShadow: '0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(236, 72, 153, 0.3)' },
+              '50%': { boxShadow: '0 0 40px rgba(139, 92, 246, 0.8), 0 0 80px rgba(236, 72, 153, 0.6)' },
+            },
+            slideUp: {
+              from: { opacity: 0, transform: 'translateY(60px)' },
+              to: { opacity: 1, transform: 'translateY(0)' },
+            },
+            rotate: {
+              from: { transform: 'rotate(0deg)' },
+              to: { transform: 'rotate(360deg)' },
+            },
+            pulse: {
+              '0%, 100%': { transform: 'scale(1)', opacity: 0.5 },
+              '50%': { transform: 'scale(1.05)', opacity: 0.8 },
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    /* Background video fills screen */
+    #bgVideo {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: -2;
+      filter: brightness(0.3);
+    }
+    /* Animated gradient overlay */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(17, 24, 39, 0.75) 25%,
+        rgba(31, 41, 55, 0.75) 50%,
+        rgba(17, 24, 39, 0.75) 75%,
+        rgba(0, 0, 0, 0.7) 100%);
+      z-index: -1;
+      animation: gradientShift 15s ease infinite;
+      background-size: 200% 200%;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Floating particles */
+    .particle {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      animation: floatParticle 20s infinite;
+    }
+    @keyframes floatParticle {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+      25% { transform: translate(100px, -100px) scale(1.2); opacity: 0.6; }
+      50% { transform: translate(-50px, -200px) scale(0.8); opacity: 0.4; }
+      75% { transform: translate(-150px, -100px) scale(1.1); opacity: 0.5; }
+    }
+
+    /* Glass morphism card */
+    .glass {
+      backdrop-filter: blur(25px) saturate(200%);
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+    .glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%);
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .glass:hover::before {
+      opacity: 1;
+    }
+    .dark .glass {
+      background: rgba(15, 23, 42, 0.7);
+      border-color: rgba(255,255,255,0.15);
+    }
+    .glass:hover {
+      transform: translateY(-12px) scale(1.05);
+      box-shadow: 0 20px 60px rgba(139, 92, 246, 0.4), 0 0 40px rgba(236, 72, 153, 0.3);
+      border-color: rgba(139, 92, 246, 0.5);
+    }
+
+    /* 3D Tilt effect */
+    .tilt {
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .tilt:hover { 
+      transform: perspective(1000px) rotateY(5deg) rotateX(5deg) scale(1.05) translateZ(20px);
+    }
+
+    /* Animated gradient text */
+    .gradient-text {
+      background: linear-gradient(90deg, #60a5fa, #a78bfa, #ec4899, #f59e0b, #60a5fa);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientFlow 3s linear infinite;
+    }
+    @keyframes gradientFlow {
+      to { background-position: 200% center; }
+    }
+
+    /* Glow button effect */
+    .glow-button {
+      position: relative;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.5);
+      transition: all 0.4s;
+    }
+    .glow-button::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+      border-radius: inherit;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.4s;
+      filter: blur(10px);
+    }
+    .glow-button:hover::before {
+      opacity: 1;
+    }
+    .glow-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 50px rgba(102, 126, 234, 0.7), 0 0 40px rgba(236, 72, 153, 0.5);
+    }
+
+    /* Shine effect on cards */
+    .shine {
+      position: relative;
+      overflow: hidden;
+    }
+    .shine::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      bottom: -50%;
+      left: -50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+      transform: rotateZ(45deg) translateY(-100%);
+      transition: transform 0.8s;
+    }
+    .shine:hover::after {
+      transform: rotateZ(45deg) translateY(100%);
+    }
+
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      animation: reveal 0.8s ease forwards;
+    }
+    @keyframes reveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="text-white dark:text-gray-100 transition-all duration-500 overflow-x-hidden">
+
+  <!-- Background Video -->
+  <video autoplay muted loop playsinline id="bgVideo">
+    <source src="https://cdn.coverr.co/videos/coverr-aerial-view-of-a-beach-7200/1080p.mp4" type="video/mp4">
+  </video>
+  <div class="overlay"></div>
+
+  <!-- Floating Particles -->
+  <div id="particles"></div>
+
+  <!-- Dark-mode toggle -->
+  <div class="fixed top-6 right-6 z-20">
+    <button id="themeToggle" class="glass p-4 rounded-full hover:scale-110 transition-transform duration-300 shine">
+      <span class="text-2xl">🌙</span>
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 py-12">
+
+    <!-- Title with enhanced animation -->
+    <div class="mb-4 reveal" style="animation-delay: 0.1s">
+      <h1 class="text-7xl md:text-8xl font-black gradient-text drop-shadow-2xl mb-2 animate-float">
+        🎬 Scriptify
+      </h1>
+      <div class="h-2 w-40 mx-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full animate-pulse"></div>
+    </div>
+
+    <!-- Subtitle with stagger animation -->
+    <p class="text-xl md:text-3xl max-w-4xl mt-8 leading-relaxed reveal" style="animation-delay: 0.3s">
+      Generate <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">AI-powered</span>, SEO-optimized YouTube scripts<br>
+      using <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-400">Trending Topics</span>, Manual Inputs, or our Creator Hub.
+    </p>
+
+    <!-- Feature Cards with enhanced design -->
+    <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-10 w-full max-w-7xl">
+
+      <a href="/trending" class="glass tilt shine rounded-3xl p-10 shadow-2xl reveal group" style="animation-delay: 0.5s">
+        <div class="text-5xl mb-4 animate-float">🚀</div>
+        <h2 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 mb-4 group-hover:scale-110 transition-transform duration-300">
+          Trending Generator
+        </h2>
+        <p class="text-gray-200 dark:text-gray-300 text-lg leading-relaxed">
+          Grab trending ideas from YouTube, Reddit & News instantly
+        </p>
+        <div class="mt-6 h-1 w-0 group-hover:w-full bg-gradient-to-r from-blue-400 to-cyan-400 transition-all duration-500 rounded-full"></div>
+      </a>
+
+      <a href="/manual-script" class="glass tilt shine rounded-3xl p-10 shadow-2xl reveal group" style="animation-delay: 0.7s">
+        <div class="text-5xl mb-4 animate-float" style="animation-delay: 0.5s">🧠</div>
+        <h2 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-400 mb-4 group-hover:scale-110 transition-transform duration-300">
+          Intelligent Scripting
+        </h2>
+        <p class="text-gray-200 dark:text-gray-300 text-lg leading-relaxed">
+          Input your own topic & let AI craft the perfect script
+        </p>
+        <div class="mt-6 h-1 w-0 group-hover:w-full bg-gradient-to-r from-pink-400 to-rose-400 transition-all duration-500 rounded-full"></div>
+      </a>
+
+      <a href="/hub" class="glass tilt shine rounded-3xl p-10 shadow-2xl reveal group" style="animation-delay: 0.9s">
+        <div class="text-5xl mb-4 animate-float" style="animation-delay: 1s">📁</div>
+        <h2 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400 mb-4 group-hover:scale-110 transition-transform duration-300">
+          Creator & Freelancer Hub
+        </h2>
+        <p class="text-gray-200 dark:text-gray-300 text-lg leading-relaxed">
+          Hire or offer editing, scriptwriting & creative services
+        </p>
+        <div class="mt-6 h-1 w-0 group-hover:w-full bg-gradient-to-r from-green-400 to-emerald-400 transition-all duration-500 rounded-full"></div>
+      </a>
+
+    </div>
+
+    <!-- CTA with enhanced glow -->
+    <div class="mt-16 reveal" style="animation-delay: 1.1s">
+      <a href="/trending" class="glow-button inline-block px-16 py-5 rounded-full text-xl font-bold text-white shadow-2xl relative overflow-hidden group">
+        <span class="relative z-10 flex items-center gap-3">
+          <span class="text-2xl animate-bounce">🚀</span>
+          Start Generating Now
+          <span class="group-hover:translate-x-2 transition-transform duration-300">→</span>
+        </span>
+      </a>
+    </div>
+
+    <!-- Footer with gradient -->
+    <footer class="mt-20 text-base reveal" style="animation-delay: 1.3s">
+      <div class="glass rounded-2xl px-8 py-4 inline-block">
+        <span class="text-gray-300">🔧 Built by </span>
+        <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Vinay Kumar</span>
+        <span class="text-gray-300">, Founder of </span>
+        <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-400">Scriptify</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Theme Toggle & Particle Script -->
+  <script>
+    // Theme toggle
+    const toggle = document.getElementById('themeToggle');
+    toggle.addEventListener('click', ()=> document.documentElement.classList.toggle('dark'));
+
+    // Create floating particles
+    const particlesContainer = document.getElementById('particles');
+    const colors = ['rgba(99, 102, 241, 0.4)', 'rgba(139, 92, 246, 0.4)', 'rgba(236, 72, 153, 0.4)', 'rgba(59, 130, 246, 0.4)'];
+    
+    for(let i = 0; i < 20; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      particle.style.width = Math.random() * 60 + 20 + 'px';
+      particle.style.height = particle.style.width;
+      particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 20 + 's';
+      particle.style.animationDuration = Math.random() * 15 + 15 + 's';
+      particlesContainer.appendChild(particle);
+    }
+
+    // 3D tilt effect for cards
+    document.querySelectorAll('.tilt').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / 10;
+        const rotateY = (centerX - x) / 10;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05) translateZ(20px)`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
+  </script>
+
+</body>
+</html>
